@@ -22,6 +22,7 @@ export default {
     provide() {
         return {
             scale: computed(() => this.scale),
+            maps: this.maps
         }
     },
     data() {

@@ -2,8 +2,7 @@
     <map-scale @scaleChange="setScale"></map-scale>
     <div 
         class="map"
-        :style="{width: scale*25 + 'px'}" >
-       
+        :style="{width: scale*blocksPerLine + 'px'}">
         <map-generator></map-generator>
     </div>
 </template>
@@ -12,29 +11,29 @@
 import { computed } from "vue";
 import MapGenerator from "./MapGenerator.vue";
 import MapScale from "./MapScale.vue";
-import mapsSchemes from '../../assets/maps/index.js';
+
 
 export default {
     components: {
         MapGenerator,
         MapScale
     },
+    inject: ['map'],
     provide() {
         return {
             scale: computed(() => this.scale),
-            maps: this.maps
         }
     },
     data() {
         return {
-            scale: 25,
-            maps: mapsSchemes,
+            scale: this.map.length,
+            blocksPerLine: this.map[0].length
         }
     },
     methods: {
         setScale(scaleValue) {
             this.scale = scaleValue;
-        }
+        },
     }
 
 }

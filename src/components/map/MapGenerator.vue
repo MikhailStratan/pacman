@@ -1,13 +1,12 @@
 <template>
     <div 
         class="map-line"
-        
-        v-for="(line, indexY) in maps.level1" 
+        v-for="(line, indexY) in map" 
         :key="indexY">
             <map-block
-                v-for="(block, indexX) in maps.level1[0]"
+                v-for="(block, indexX) in map[0]"
                 :key="indexX"
-                :blockType="maps.level1[indexY][indexX]"></map-block>
+                :blockType="map[indexY][indexX]"></map-block>
     </div>
 </template>
 
@@ -19,18 +18,18 @@ export default {
     components: {
         MapBlock
     },
-    inject: ['scale', 'maps'],
+    inject: ['scale', 'map'],
     data() {
         return {
 
             mapSize: {
-                vertivalSize: this.maps.level1.length,
-                horizontalSize: this.maps.level1[0].length,
+                vertivalSize: this.map.length,
+                horizontalSize: this.map[0].length,
             }
         }
     },
     created() {
-        console.log(this.maps.level1)
+        console.log(this.map)
     }
 }
 </script>

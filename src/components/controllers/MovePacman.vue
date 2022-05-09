@@ -1,97 +1,107 @@
 <template>
     <div>
-        
+
     </div>
 </template>
 
 <script>
 export default {
-    inject: ['map'],
+    inject: [
+        'map',
+        'position',
+        'speed',
+        'updatePacmanPosition',
+        'leftover'
+    ],
     emits: ['moveUp'],
     data() {
         return {
-            position: {
-                y: null,
-                x: null,
-                previous: {
-                    x: null,
-                    y: null,
-                }
-            },
             movesListener: null,
-
+            movesInterval: null,
+            possibleWays: {
+                up: null,
+                down: null,
+                left: null,
+                right: null
+            },
+            way: null
+        }
+    },
+    watch: {
+        possibleWays() {
+            for (let way in this.possibleWays) {
+                if (this.possibleWays[way] === false && way === this.way) {
+                    console.log(`Can't go ${way}`)
+                    clearInterval(this.movesInterval);
+                }
+            }
         }
     },
     methods: {
         move(direction) {
-                let newX, newY;
-                switch (direction) {
-                    case 'up':
-                        newX = this.position.x;
-                        newY = this.position.y - 1;
-                        break;
-                    case 'down':
-                        newX = this.position.x;
-                        newY = this.position.y + 1;
-                        break;
-                    case 'left':
-                        newX = this.position.x - 1;
-                        newY = this.position.y;
-                        break;
-                    case 'right':
-                        newX = this.position.x + 1;
-                        newY = this.position.y;
-                        break;
-                    default:
-                        break;
-                }
+            this.updatePossibleWays();
+            let newX, newY;
 
-                this.map[newY][newX] = 3;
-                this.updatePacmanPosition(newY, newX);
-                this.setLeftover(this.position.previous.y,this.position.previous.x);
-
-            console.log(this.position)
-        },
-
-        definePacmanPosition() {
-            this.map.forEach((mapLine, indexY) => {
-                mapLine.forEach((item, indexX) => {
-                    if (item === 3) {
-                        this.updatePacmanPosition(indexY,indexX)
-                    }
-                })
-            });
-        },
-
-        updatePacmanPosition(y,x) {
-            this.position.previous = {
-                y: this.position.y,
-                x: this.position.x
+            if (direction === 'up' && this.possibleWays.up) {
+                newX = this.position.x;
+                newY = this.position.y - 1;
+            } else if (direction === 'down' && this.possibleWays.down) {
+                newX = this.position.x;
+                newY = this.position.y + 1;
+            } else if (direction === 'left' && this.possibleWays.left) {
+                newX = this.position.x - 1;
+                newY = this.position.y;
+            } else if (direction === 'right' && this.possibleWays.right) {
+                newX = this.position.x + 1;
+                newY = this.position.y;
             }
-            this.position.y = y;
-            this.position.x = x;
+
+            this.way = direction;
+            this.map[newY][newX] = 3;
+            this.updatePacmanPosition(newY, newX);
+            this.setLeftover(this.position.previous.y, this.position.previous.x);
+            console.log('works')
         },
 
-        setLeftover(y,x) {
-            this.map[y][x] = 2;
+        setLeftover(y, x) {
+            this.map[y][x] = this.leftover;
         },
 
         addMovesListener() {
+            console.log('added')
             this.movesListener = addEventListener('keydown', (event) => {
                 event.preventDefault();
-                if (event.code === 'ArrowUp') this.move('up');
-                if (event.code === 'ArrowDown') this.move('down');
-                if (event.code === 'ArrowRight') this.move('right');
-                if (event.code === 'ArrowLeft') this.move('left');
-                
+                if (event.code === 'ArrowUp') this.startMoves(() => this.move('up'));
+                if (event.code === 'ArrowDown') this.startMoves(() => this.move('down'));
+                if (event.code === 'ArrowRight') this.startMoves(() => this.move('right'));
+                if (event.code === 'ArrowLeft') this.startMoves(() => this.move('left'));
             });
-        }
+        },
+
+        startMoves(moveCallback) {
+            if (this.movesInterval) {
+                clearInterval(this.movesInterval)
+            }
+            console.log(moveCallback, this.speed)
+            this.movesInterval = setInterval(moveCallback, this.speed)
+        },
+
+        updatePossibleWays() {
+            const y = this.position.y;
+            const x = this.position.x;
+            this.possibleWays = {
+                up: this.map[y - 1][x] === 0 ? false : true,
+                down: this.map[y + 1][x] === 0 ? false : true,
+                left: this.map[y][x - 1] === 0 ? false : true,
+                right: this.map[y][x + 1] === 0 ? false : true,
+            }
+        },
 
     },
     created() {
-        this.definePacmanPosition();
+        this.updatePossibleWays();
+        console.log(this.possibleWays)
         this.addMovesListener();
-        console.log(this.position)
     }
 }
 </script>

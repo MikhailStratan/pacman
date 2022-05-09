@@ -1,19 +1,19 @@
 <template>
     <h2 class="title">Pacman</h2>
     <map-container></map-container>
-    <move-pacman></move-pacman>
+    <actor-pacman></actor-pacman>
 </template>
 
 <script>
 import MapContainer from './components/map/MapContainer.vue'
-import MovePacman from './components/controllers/MovePacman.vue';
+import ActorPacman from './components/actors/ActorPacman.vue';
 import mapsSchemes from './assets/maps/index';
 
 export default {
     name: 'App',
     components: {
         MapContainer,
-        MovePacman
+        ActorPacman
     },
     provide() {
         return {

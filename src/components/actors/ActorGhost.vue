@@ -6,66 +6,60 @@
 
 <script>
 import MovePacman from "../controllers/MovePacman.vue";
-
 export default {
-    inject: ['map'],
-    components: {
-        MovePacman
+    components: { 
+        MovePacman 
     },
+    props: {
+        color: String,
+        blockType: String
+    },
+    inject: ['map'],
+    
     provide() {
         return {
             position: this.position,
             speed: this.speed,
-            leftover: this.leftover,
-            updatePosition: this.updatePacmanPosition,
-            actor: 'pacman',
-            blockType: 3
-        }
+            updatePosition: this.updateGhostPosition,
+            actor: "ghost",
+            blockType: this.blockType,
+            leftover: this.leftover
+        };
     },
     data() {
         return {
             position: {
                 y: null,
                 x: null,
-                previous: {
-                    x: null,
-                    y: null,
-                }
             },
             speed: 300,
-            leftover: 2
-        }
-    },
-    watch: {
-        position() {
-            console.log(this.position)
-        }
+            leftover: 1
+        };
     },
     methods: {
-        setPacmanPosition() {
+        setGhostPosition() {
             this.map.forEach((mapLine, indexY) => {
                 mapLine.forEach((item, indexX) => {
-                    if (item === 3) {
-                        this.updatePacmanPosition(indexY,indexX)
+                    if (item === this.blockType) {
+                        this.updateGhostPosition(indexY, indexX);
                     }
-                })
+                });
             });
         },
-
-        updatePacmanPosition(y,x) {
+        updateGhostPosition(y, x) {
             this.position.previous = {
                 y: this.position.y,
                 x: this.position.x
-            }
+            };
             this.position.y = y;
             this.position.x = x;
             console.log(this.position);
         },
-
-
     },
     created() {
-        this.setPacmanPosition();
-    }
+        this.setGhostPosition();
+        console.log(this.positions);
+    },
+    
 }
 </script>

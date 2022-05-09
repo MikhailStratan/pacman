@@ -5,7 +5,7 @@
         :key="indexY">
             <map-block
                 v-for="(block, indexX) in map[0]"
-                :key="indexX"
+                :key="''+indexX+indexY"
                 :blockType="map[indexY][indexX]"></map-block>
     </div>
 </template>

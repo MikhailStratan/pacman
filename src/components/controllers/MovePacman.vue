@@ -10,8 +10,10 @@ export default {
         'map',
         'position',
         'speed',
-        'updatePacmanPosition',
-        'leftover'
+        'updatePosition',
+        'leftover',
+        'actor',
+        'blockType'
     ],
     emits: ['moveUp'],
     data() {
@@ -57,17 +59,31 @@ export default {
             }
 
             this.way = direction;
-            this.map[newY][newX] = 3;
-            this.updatePacmanPosition(newY, newX);
-            this.setLeftover(this.position.previous.y, this.position.previous.x);
+            this.map[newY][newX] = this.blockType;
+            this.updatePosition(newY, newX);
+            if (this.leftover) {
+                this.setLeftover(this.position.previous.y, this.position.previous.x);
+            }
             console.log('works')
+        },
+
+        randomMove() {
+            this.updatePossibleWays();
+            const possibleWaysArray = Object.keys(this.possibleWays).filter(way => this.possibleWays[way]);
+            const randomChoose = Math.floor(Math.random() * possibleWaysArray.length);
+            
+            if (possibleWaysArray.includes(this.way)) {
+                this.move(this.way);
+                return;
+            }
+            this.move(possibleWaysArray[randomChoose]);
         },
 
         setLeftover(y, x) {
             this.map[y][x] = this.leftover;
         },
 
-        addMovesListener() {
+        addPacmanMovesListener() {
             console.log('added')
             this.movesListener = addEventListener('keydown', (event) => {
                 event.preventDefault();
@@ -75,7 +91,12 @@ export default {
                 if (event.code === 'ArrowDown') this.startMoves(() => this.move('down'));
                 if (event.code === 'ArrowRight') this.startMoves(() => this.move('right'));
                 if (event.code === 'ArrowLeft') this.startMoves(() => this.move('left'));
+                
             });
+        },
+
+        addGhostMoves(moveCallback) {
+            this.movesInterval = setInterval(moveCallback, this.speed);
         },
 
         startMoves(moveCallback) {
@@ -101,7 +122,12 @@ export default {
     created() {
         this.updatePossibleWays();
         console.log(this.possibleWays)
-        this.addMovesListener();
+        if (this.actor === 'pacman') {
+            this.addPacmanMovesListener();
+        } else {
+            this.addGhostMoves(() => this.randomMove());
+        }
+        
     }
 }
 </script>
